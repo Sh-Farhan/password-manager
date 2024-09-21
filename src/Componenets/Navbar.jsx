@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 
 const Navbar = () => {
+
   return (
     <nav className='bg-slate-800'>
         <div className="mycontainer text-white flex justify-between items-center px-4 py-5 h-14">
