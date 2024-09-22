@@ -1,10 +1,16 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { FaEye } from "react-icons/fa";
 
 const Manager = () => {
   const inputRef = useRef(null);
 
   const [form,setForm] = useState({site: "", username: "", password: ""});
+  const [passwordArray,setPasswordArray] = useState([]);
+
+  useEffect(() => {
+    let passwords = localStorage.getItem("passwords");
+    if(passwords) setPasswordArray(JSON.parse(passwords))
+  },[])
 
   const togglePass = (e) => {
     if (inputRef.current) {
@@ -16,7 +22,9 @@ const Manager = () => {
   }
 
   const addPass = () => {
-    console.log(form)
+    setPasswordArray([...passwordArray,form]);
+    localStorage.setItem("passwords",JSON.stringify([...passwordArray,form]));
+    console.log(passwordArray)
   }
 
   const handleChange = (e) => {
@@ -48,6 +56,32 @@ const Manager = () => {
     src="https://cdn.lordicon.com/jgnvfzqg.json"
     trigger="hover"></lord-icon>
         Add password</button>
+      </div>
+      <div className="passwords">
+        <h2 className='text-2xl font-bold'>Your passwords</h2>
+        {passwordArray.length === 0 && <div>No passwords to show</div>}
+        {passwordArray.length > 0 && 
+        <table class="table-auto w-full">
+  <thead className='bg-gray-800 text-white'>
+    <tr>
+      <th>Site</th>
+      <th >Username</ th>
+      <th >Password</th> 
+    </tr> 
+  </thead>
+  <tbody className='bg-green-200 font-mono'>
+    {passwordArray.map((item,index) => {
+      return(
+        <tr key={index}>
+        <td className='text-center w-40 border py-2 border-lime-600'><a href={item.site} target='_blank'>{item.site}</a></td>
+        <td className='text-center w-40 border py-2 border-lime-600'>{item.username}</td>
+        <td className='text-center w-40 border py-2 border-lime-600'>{item.password}</td>
+      </tr>
+      )
+    })}
+
+  </tbody>
+</table>}
       </div>
       </div>
     </>
