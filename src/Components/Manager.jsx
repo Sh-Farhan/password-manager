@@ -1,5 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { FaEye } from "react-icons/fa";
+import { CiEdit } from "react-icons/ci";
+import { MdDelete } from "react-icons/md";
+import { v4 as uuidv4 } from 'uuid';
 
 const Manager = () => {
   const inputRef = useRef(null);
@@ -22,9 +25,15 @@ const Manager = () => {
   }
 
   const addPass = () => {
-    setPasswordArray([...passwordArray,form]);
-    localStorage.setItem("passwords",JSON.stringify([...passwordArray,form]));
-    console.log(passwordArray)
+    setPasswordArray([...passwordArray,{...form,id: uuidv4()}]);
+    localStorage.setItem("passwords",JSON.stringify([...passwordArray,{...form,id: uuidv4()}]));
+    // console.log(passwordArray)
+  }
+
+  const deletePass = (id) => {
+    let updatedPassword = passwordArray.filter((item) => item.id !== id);
+    setPasswordArray(updatedPassword);
+    localStorage.setItem("passwords",JSON.stringify(updatedPassword))
   }
 
   const handleChange = (e) => {
@@ -65,17 +74,24 @@ const Manager = () => {
   <thead className='bg-gray-800 text-white'>
     <tr>
       <th>Site</th>
-      <th >Username</ th>
-      <th >Password</th> 
+      <th>Username</ th>
+      <th>Password</th> 
+      <th>Actions</th>
     </tr> 
   </thead>
   <tbody className='bg-green-200 font-mono'>
     {passwordArray.map((item,index) => {
       return(
         <tr key={index}>
-        <td className='text-center w-40 border py-2 border-lime-600'><a href={item.site} target='_blank'>{item.site}</a></td>
-        <td className='text-center w-40 border py-2 border-lime-600'>{item.username}</td>
-        <td className='text-center w-40 border py-2 border-lime-600'>{item.password}</td>
+        <td className='text-center text-xl w-40 border py-2 border-lime-600'><a href={item.site} target='_blank'>{item.site}</a></td>
+        <td className='text-center text-xl w-40 border py-2 border-lime-600'>{item.username}</td>
+        <td className='text-center text-xl w-40 border py-2 border-lime-600'>{item.password}</td>
+        <td className='text-center text-xl w-3 border py-2 border-lime-600'>
+          <div className='flex justify-center gap-8'>
+          <button><CiEdit size={30} /></button>
+          <button onClick={() => deletePass(item.id)}><MdDelete size={30} /></button>
+          </div>
+        </td>
       </tr>
       )
     })}
