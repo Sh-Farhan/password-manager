@@ -3,6 +3,7 @@ import { FaEye } from "react-icons/fa";
 import { CiEdit } from "react-icons/ci";
 import { MdDelete } from "react-icons/md";
 import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
 
 const Manager = () => {
   const inputRef = useRef(null);
@@ -10,9 +11,14 @@ const Manager = () => {
   const [form,setForm] = useState({site: "", username: "", password: ""});
   const [passwordArray,setPasswordArray] = useState([]);
 
+  const getPassword = async () => {
+    const pass = await axios.get("http://localhost:3000/");
+    let password = pass.data;
+    setPasswordArray(password)
+  }
+
   useEffect(() => {
-    let passwords = localStorage.getItem("passwords");
-    if(passwords) setPasswordArray(JSON.parse(passwords))
+    getPassword();
   },[])
 
   const togglePass = (e) => {
@@ -25,15 +31,35 @@ const Manager = () => {
   }
 
   const addPass = () => {
+    if(form.username && form.password && form.site){
     setPasswordArray([...passwordArray,{...form,id: uuidv4()}]);
-    localStorage.setItem("passwords",JSON.stringify([...passwordArray,{...form,id: uuidv4()}]));
-    // console.log(passwordArray)
+    axios.post("http://localhost:3000/",{
+      id: uuidv4(),
+      "site": form.site,
+      "username": form.username,
+      "password": form.password
+    })
+    setForm({site: "", username: "", password: ""})
+    }
+    else alert(`Input the fields completely`)
   }
 
   const deletePass = (id) => {
-    let updatedPassword = passwordArray.filter((item) => item.id !== id);
-    setPasswordArray(updatedPassword);
-    localStorage.setItem("passwords",JSON.stringify(updatedPassword))
+    let c = confirm("Do you really want to delete this password !?");
+    if(c){
+      let updatedPassword = passwordArray.filter((item) => item.id !== id)[0];
+      let myPassword = passwordArray.filter((item) => item.id === id)
+      setPasswordArray(updatedPassword);
+      console.log(myPassword)
+      axios.delete("http://localhost:3000/",{
+        myPassword
+      })
+    }
+  }
+
+  const editPass = (id) => {
+    console.log("editing password ",id)
+    setForm(passwordArray.filter((item) => item.id === id)[0])
   }
 
   const handleChange = (e) => {
@@ -88,7 +114,7 @@ const Manager = () => {
         <td className='text-center text-xl w-40 border py-2 border-lime-600'>{item.password}</td>
         <td className='text-center text-xl w-3 border py-2 border-lime-600'>
           <div className='flex justify-center gap-8'>
-          <button><CiEdit size={30} /></button>
+          <button onClick={() => editPass(item.id)}><CiEdit size={30} /></button>
           <button onClick={() => deletePass(item.id)}><MdDelete size={30} /></button>
           </div>
         </td>
