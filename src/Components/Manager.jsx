@@ -44,17 +44,22 @@ const Manager = () => {
     else alert(`Input the fields completely`)
   }
 
-  const deletePass = (id) => {
+  const deletePass = async (id) => {
     let c = confirm("Do you really want to delete this password !?");
     if(c){
-      let updatedPassword = passwordArray.filter((item) => item.id !== id)[0];
-      let myPassword = passwordArray.filter((item) => item.id === id)
-      setPasswordArray(updatedPassword);
-      console.log(myPassword)
-      axios.delete("http://localhost:3000/",{
-        myPassword
+      let updatedPasword = passwordArray.filter((item) => item.id === id)[0]
+      setPasswordArray(passwordArray.filter((item) => item.id !== id))
+      console.log(updatedPasword)
+
+      let res = await fetch("http://localhost:3000/",{method: "DELETE",
+        headers: {"Content-type": "application/json"},
+        body: JSON.stringify({
+          site: updatedPasword.site,
+          username: updatedPasword.username,
+          password: updatedPasword.password
+        })
       })
-    }
+      }
   }
 
   const editPass = (id) => {
